@@ -1,4 +1,4 @@
-import parse
+import Stundenplan_parser.parse as parse
 import os
 import urllib.request, urllib.error, urllib.parse
 
@@ -12,7 +12,7 @@ class Stundenplan:
         except FileExistsError:
             pass
 
-    def get_plan(self, today): # Nimmt den Stundenplan und schreibt ihn in eine Datei
+    def get_plan(self, today): # Nimmt den Stundenplan_parser und schreibt ihn in eine Datei
         url = self.adress[not today]
         response = urllib.request.urlopen(url)
         webcontent = response.read()
@@ -32,13 +32,6 @@ class Stundenplan:
         os.removedirs("./tmp")
 
 
-if __name__ =="__main__":
+def getStundenplan():
     s = Stundenplan()
-    s.get_plan(True)
-    s.parse_plan()
-    s.remove_plan()
-    print(s.plan.Title)
-    for i in s.plan.Vertretungen:
-        if i.Klasse == '5C':
-
-            print(i.Klasse, i.Stunde, i.Fach, i.Raum, i.Sonstiges)
+    return s

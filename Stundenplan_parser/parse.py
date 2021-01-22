@@ -1,4 +1,4 @@
-import vertretung
+import Stundenplan_parser.vertretung as vertretung
 
 
 class Parser:
