@@ -8,7 +8,7 @@ from datetime import datetime
 
 client = discord.Client()
 
-klassen = ["!8a", "!8b", "!8c", "!8d", ]
+klassen = ["8a", "8b", "8c", "8d", ]
 prefix = "!"
 
 
@@ -26,7 +26,7 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if not message.content.startswith(prefix)):
+    if not message.content.startswith(prefix):
         return
 
     if message.content == prefix + 'help':
@@ -40,7 +40,7 @@ async def on_message(message):
         await message.channel.send(embed=embedHelp)
 
     for i in klassen:
-        if message.content.startswith(i):
+        if message.content.startswith(prefix + i):
             # get time and date when rhe request is made
             now = datetime.now()                                                       
             current_time = now.strftime("%H:%M")
@@ -52,7 +52,7 @@ async def on_message(message):
 
             else:
                 # create embed
-                embedPlanHeute = discord.Embed(title="Vertretungsplan Klasse " + i.replace('!', '') + "  Datum", description="---", color=0xfd0f02)
+                embedPlanHeute = discord.Embed(title="Vertretungsplan Klasse " + i + " für den " + current_date, description="---", color=0xfd0f02)
                 embedPlanHeute.add_field(name="rr", value="ee", inline=False)
                 embedPlanHeute.add_field(name="xx", value="xx", inline=True)
                 embedPlanHeute.set_footer(text="Stand: " + current_date + ", " + current_time)
