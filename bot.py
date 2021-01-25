@@ -8,7 +8,7 @@ from datetime import datetime
 
 client = discord.Client()
 
-klassen = ["8a", "8b", "8c", "8d", ]
+klassen = ["8a", "8b", "8c", "8d"]        #TODO add more commands
 prefix = "!"
 
 
@@ -36,7 +36,7 @@ async def on_message(message):
         embedHelp.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2MH0LGbSQPti92wXwtdVygovKCH2UNcNJug&usqp=CAU")
         embedHelp.add_field(name="![Klasse]", value="Vertretungsplan heute\n Bsp: !9a", inline=False)
         embedHelp.add_field(name="![Klasse] morgen", value="Vertretungsplan für morgen \n Bsp: !9a morgen", inline=True)
-        embedHelp.set_footer(text='Made by Chris00004')
+        embedHelp.set_footer(text='Made by adamane, Chris00004')
         await message.channel.send(embed=embedHelp)
 
     for i in klassen:
@@ -48,13 +48,14 @@ async def on_message(message):
             current_date = today.strftime("%d.%m")
 
             if message.content.find("morgen") != -1:
-                await message.channel.send("Klasse existiert; Vertretungsplan morgen")
+                #TODO create embed for "Vertretungsplan morgen"
+                print("morgen")
 
             else:
                 # create embed
-                embedPlanHeute = discord.Embed(title="Vertretungsplan Klasse " + i + " für den " + current_date, description="---", color=0xfd0f02)
-                embedPlanHeute.add_field(name="rr", value="ee", inline=False)
-                embedPlanHeute.add_field(name="xx", value="xx", inline=True)
+                embedPlanHeute = discord.Embed(title="Vertretungsplan Klasse " + i + " für den " + current_date, description="---", color=2123412) #TODO make the heading clearer
+                embedPlanHeute.add_field(name="1.Stunde", value="ee", inline=False)                                                                         
+                embedPlanHeute.add_field(name="2.Sunde", value="xx", inline=True)
                 embedPlanHeute.set_footer(text="Stand: " + current_date + ", " + current_time)
                 await message.channel.send(embed=embedPlanHeute)
 
