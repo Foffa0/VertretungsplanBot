@@ -1,1 +1,5 @@
 bot.token
+.idea/
+venv
+Stundenplan_parser/__pycache__/
+tmp/
