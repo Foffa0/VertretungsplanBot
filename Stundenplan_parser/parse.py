@@ -37,5 +37,5 @@ class Parser:
             for i in spalte.split("</td>"):
                 x = i.split(">")[1]
                 args.append(x)
-            self.Vertretungen.append(vertretung.Vertretung(args[0], int(args[1]), str(args[2]), str(args[3]),
-                                                           str(args[5]), str(args[6]), str(args[7])))
+            self.Vertretungen.append(vertretung.Vertretung(klasse=args[0].strip(" "), std=int(args[1]), vertretung=str(args[2]), fach=str(args[3]),
+                                                           lehrer=str(args[5]), raum=str(args[6]), sonstiges=str(args[7])))

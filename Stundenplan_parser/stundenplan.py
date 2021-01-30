@@ -16,19 +16,34 @@ class Stundenplan:
         url = self.adress[not today]
         response = urllib.request.urlopen(url)
         webcontent = response.read()
-        f = open('tmp/tmp.html', 'w', encoding="UTF-16")
+        if not today:
+            name = "Today"
+        else:
+            name = "Tomorrow"
+        f = open(f'tmp/{name}.html', 'w', encoding="UTF-16")
         f.write(webcontent.decode("UTF-16"))
         f.close()
 
-    def parse_plan(self): #Schickt den stundenplan in der Datei an den Parser und erhällt ein Parser objekt
-        par = parse.Parser("tmp/tmp.html")
+    def parse_plan(self, today): #Schickt den stundenplan in der Datei an den Parser und erhällt ein Parser objekt
+        if not today:
+            name = "Today"
+        else:
+            name = "Tomorrow"
+        par = parse.Parser(f"tmp/{name}.html")
         par.parse_header()
         par.parse_body()
         self.plan = par
 
     @staticmethod
     def remove_plan():
-        os.remove("tmp/tmp.html")
+        try:
+            os.remove("tmp/Today.html")
+        except FileNotFoundError:
+            pass
+        try:
+            os.remove("tmp/Tomorrow.html")
+        except FileNotFoundError:
+            pass
         os.removedirs("./tmp")
 
 

@@ -11,24 +11,38 @@ client = discord.Client()
 klassen = ["5a","8a", "8b", "8c", "8d", "2d1"]
 prefix = "!"
 
+def create_embed(klasse, s):
+     # create embed
+        embedPlanHeute = discord.Embed(title=s.plan.Title, description="---", color=0xfd0f02)
+        isEmpty = True
+        for vertretung in s.plan.Vertretungen:
+            if klasse == vertretung.Klasse: 
+                isEmpty = False
+                embedPlanHeute.add_field(name=f"Stunde {vertretung.Stunde} ", 
+                                        value=f"""{vertretung.Vertretung} statt {vertretung.Lehrkraft} in {vertretung.Raum}
+                                        {vertretung.Sonstiges}""", inline=False)
+        if isEmpty:
+            embedPlanHeute.add_field(name="Für diese Klasse sind keine Vertretungen eingestellt", value="Versucht es später noch einmal", inline=False)
+        embedPlanHeute.set_footer(text="Stand: " + s.plan.geaendert_am)
+        return embedPlanHeute
 
 @client.event
 async def on_ready():
     print('Logged in as {}'.format(client.user.name))
-    s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
+    Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
+    s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
     #create custom bot state
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
 
 @client.event
 async def on_message(message):
 
-    print(message.content)
 
     if message.author == client.user:
         return
 
     if not message.content.startswith(prefix):
-        pass
+        return
 
     if message.content == prefix + 'help':  # Helper Message Handler
         # create help embed
@@ -39,51 +53,35 @@ async def on_message(message):
         embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen", inline=True)
         embedHelp.set_footer(text='Made by Chris00004 and adamane')
         await message.channel.send(embed=embedHelp)
+
+    print(message.content)
     
-    if message.content.lower().split("!")[1] in klassen:
-        klasse = message.content.lower().split("!")[1]
-        # await message.channel.send("Klasse Existiert")
+    if "morgen" not in message.content: # This is requesting the plan everytime a command is issued !TODO: make it check the age of the plan and use the already downloaded
+        today = False
+        s.get_plan(False)
+        print("detected today")
+    else:
+        today = True
+        s.get_plan(True)
+        print("detected tomorrow")
 
-        if "morgen" in message.content:
-            s.get_plan(True)
-        else:
-            s.get_plan(False)
-        
-        s.parse_plan()
+    print(message.content.lower().strip("!"))
 
-        # create embed
-        embedPlanHeute = discord.Embed(title=s.plan.Title, description="---", color=0xfd0f02)
-        for vertretung in s.plan.Vertretungen:
-            if vertretung.Klasse is klasse:
-                embedPlanHeute.add_field(name=f"Stunde {vertretung.Stunde} ", 
-                                        value=f"""{vertretung.Vertretung} statt {vertretung.Lehrkraft} in {vertretung.Raum}
-                                        {vertretung.Sonstiges}""", inline=False)
-            else:
-                embedPlanHeute.add_field(name=vertretung.Klasse, value=klasse)
-            # embedPlanHeute.add_field(name="xx", value="xx", inline=True)
-        embedPlanHeute.set_footer(text="Stand: " + s.plan.geaendert_am)
+    if message.content.lower().strip("!") in klassen:  # Responds to commands that include today
+        klasse = message.content.lower().strip("!")
+        s.parse_plan(today=today)
+
+        embedPlanHeute = create_embed(klasse=klasse, s=s)
         await message.channel.send(embed=embedPlanHeute)
+
+    elif message.content.lower().strip("!") + " morgen" in klasse:
+        klasse = message.content.lower().strip("!")
+        s.parse_plan(today=today)
+
+        embedPlanHeute = create_embed(klasse=klasse, s=s)
+        await message.channel.send(embed=embedPlanHeute)    
     
-    """
-    for klasse in klassen: 
-        if message.content.startswith(prefix + klasse):
-            # get time and date when the request is made
-            now = datetime.now()                                                       
-            current_time = now.strftime("%H:%M")
-            today = date.today()
-            current_date = today.strftime("%d.%m")
 
-            if message.content.find("morgen") != -1:
-                await message.channel.send("Klasse existiert; Vertretungsplan morgen")
-
-            else:
-                # create embed
-                embedPlanHeute = discord.Embed(title="Vertretungsplan Klasse " + klasse + " für den " + current_date, description="---", color=0xfd0f02)
-                embedPlanHeute.add_field(name="rr", value="ee", inline=False)
-                embedPlanHeute.add_field(name="xx", value="xx", inline=True)
-                embedPlanHeute.set_footer(text="Stand: " + current_date + ", " + current_time)
-                await message.channel.send(embed=embedPlanHeute)
-    """
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
