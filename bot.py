@@ -16,11 +16,12 @@ prefix = "!"
 def create_embed(klasse, s):
      # create embed
         embedPlanHeute = discord.Embed(title=s.plan.Title, description="---", color=0xfd0f02)
+        embedPlanHeute.set_author(name=f"Klasse {klasse}")
         isEmpty = True
         for vertretung in s.plan.Vertretungen:
             if klasse == vertretung.Klasse: 
                 isEmpty = False
-                embedPlanHeute.add_field(name=f"Stunde {vertretung.Stunde} ", 
+                embedPlanHeute.add_field(name=f"Stunde {vertretung.Stunde}", 
                                         value=f"""{vertretung.Vertretung} statt {vertretung.Lehrkraft} in {vertretung.Raum}
                                         {vertretung.Sonstiges}""", inline=False)
         if isEmpty:
