@@ -8,7 +8,9 @@ s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Ins
 
 client = discord.Client()
 
+
 klassen = ["5a","8a", "8b", "8c", "8d", "2d1"]
+
 prefix = "!"
 
 def create_embed(klasse, s):
@@ -85,5 +87,6 @@ async def on_message(message):
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
+
 
 client.run(token)
