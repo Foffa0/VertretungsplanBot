@@ -9,7 +9,7 @@ s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Ins
 client = discord.Client()
 
 
-klassen = ["5a","8a", "8b", "8c", "8d", "2d1"]
+#klassen = ["5a","8a", "8b", "8c", "8d", "2d1"]
 
 prefix = "!"
 
@@ -47,6 +47,11 @@ async def on_message(message):
     if not message.content.startswith(prefix):
         return
 
+    if not message.content.lower().strip("!")[0].isdigit():
+        embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
+        await message.channel.send(embed=embedError)
+        return
+
     if message.content == prefix + 'help':  # Helper Message Handler
         # create help embed
         embedHelp = discord.Embed(title="Vertretungsplan Bot Commands:", description="---", color=0xfd0f02)
@@ -70,21 +75,13 @@ async def on_message(message):
 
     print(message.content.lower().strip("!"))
 
-    if message.content.lower().strip("!") in klassen:  # Responds to commands that include today
+    if message.content.lower().strip("!")[0].isdigit():
+        print("detected class")
         klasse = message.content.lower().strip("!")
         s.parse_plan(today=today)
 
         embedPlanHeute = create_embed(klasse=klasse, s=s)
         await message.channel.send(embed=embedPlanHeute)
-
-    elif message.content.lower().strip("!") + " morgen" in klasse:
-        klasse = message.content.lower().strip("!")
-        s.parse_plan(today=today)
-
-        embedPlanHeute = create_embed(klasse=klasse, s=s)
-        await message.channel.send(embed=embedPlanHeute)    
-    
-
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
