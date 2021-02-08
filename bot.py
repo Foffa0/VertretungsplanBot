@@ -77,7 +77,7 @@ async def on_message(message):
 
     if klasse[0].isdigit():
         c = False
-        for i in string.ascii_lowercase:
+        for i in list(string.ascii_lowercase):
             if klasse[1] == i:
                 c = True
         if c == False:
