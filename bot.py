@@ -1,7 +1,7 @@
 import discord
 import Stundenplan_parser  #Importiert das Modul
 from datetime import date
-
+import string
 from datetime import datetime
 
 s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
@@ -73,15 +73,21 @@ async def on_message(message):
         s.get_plan(True)
         print("detected tomorrow")
 
-    print(message.content.lower().strip("!"))
+    klasse = message.content.lower().strip("!")
 
-    if message.content.lower().strip("!")[0].isdigit():
-        print("detected class")
-        klasse = message.content.lower().strip("!")
-        s.parse_plan(today=today)
-
-        embedPlanHeute = create_embed(klasse=klasse, s=s)
-        await message.channel.send(embed=embedPlanHeute)
+    if klasse[0].isdigit():
+        c = False
+        for i in string.ascii_lowercase:
+            if klasse[1] == i:
+                c = True
+        if c == False:
+            return
+       
+    print("detected class")
+   
+    s.parse_plan(today=today)
+    embedPlanHeute = create_embed(klasse=klasse, s=s)
+    await message.channel.send(embed=embedPlanHeute)
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
