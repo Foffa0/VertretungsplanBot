@@ -3,4 +3,4 @@ bot.token
 venv
 Stundenplan_parser/__pycache__/
 tmp/
-__pycache__/autodelete.cpython-38.pyc
+__pycache__/
