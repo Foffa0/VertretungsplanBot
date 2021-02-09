@@ -1,3 +1,7 @@
+#
+#Testbot for testing the autodelete feature
+#
+
 import discord
 
 from discord.ext import commands

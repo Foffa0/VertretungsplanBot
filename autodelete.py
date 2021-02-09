@@ -44,6 +44,7 @@ async def msgAddAutodelete_oneDay(message):
 #add message for auto deleting after two days
 async def msgAddAutodelete_twoDays(message):
     message_id = message.id
+    #change list after one day
     if today != msgDay2_1:
         msgList = 2
     if msgList == 1:
