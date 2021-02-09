@@ -18,11 +18,12 @@ botMessages = []
 
 channel_id = 797847499485872179                 #ID of the bot-commands channel for deletig messages
 
-async def my_background_task():
+#background task to get time and delete messages every 60 seconds
+async def autodelete_background_task():
     while True:
         await autodelete.getTime()
         await autodelete.deleteMessages(client)
-        await asyncio.sleep(60)
+        await asyncio.sleep(900) #900 for 15min sleep
 
 
 @client.event
@@ -30,7 +31,7 @@ async def on_ready():
     print('Logged in as {}'.format(client.user.name))
     #create custom bot state
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
-    client.loop.create_task(my_background_task())
+    client.loop.create_task(autodelete_background_task())
 
 
 
