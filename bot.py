@@ -1,17 +1,29 @@
 import discord
 import Stundenplan_parser  #Importiert das Modul
-from datetime import date
+#from datetime import date
 import string
-from datetime import datetime
+#from datetime import datetime
+
+from discord.ext import commands
+import asyncio
+import autodelete
 
 s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
 
-client = discord.Client()
+client = commands.Bot(command_prefix='!')
 
-
-#klassen = ["5a","8a", "8b", "8c", "8d", "2d1"]
+channel_id = 797847499485872179                 #ID of the bot-commands channel for deletig messages
 
 prefix = "!"
+
+
+
+#background task to get time and delete messages every 60 seconds
+async def autodelete_background_task():
+    while True:
+        await autodelete.getTime()
+        await autodelete.deleteMessages(client)
+        await asyncio.sleep(900) #900 for 15min sleep
 
 def create_embed(klasse, s):
      # create embed
@@ -29,6 +41,8 @@ def create_embed(klasse, s):
         embedPlanHeute.set_footer(text="Stand: " + s.plan.geaendert_am)
         return embedPlanHeute
 
+
+
 @client.event
 async def on_ready():
     print('Logged in as {}'.format(client.user.name))
@@ -36,6 +50,7 @@ async def on_ready():
     s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
     #create custom bot state
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help"))
+    client.loop.create_task(autodelete_background_task()) #starts the background task
 
 @client.event
 async def on_message(message):
@@ -44,12 +59,10 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if not message.content.startswith(prefix):
+    if message.channel.id != channel_id:
         return
 
-    if not message.content.lower().strip("!")[0].isdigit():
-        embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
-        await message.channel.send(embed=embedError)
+    if not message.content.startswith(prefix):
         return
 
     if message.content == prefix + 'help':  # Helper Message Handler
@@ -61,17 +74,30 @@ async def on_message(message):
         embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen", inline=True)
         embedHelp.set_footer(text='Made by Chris00004 and adamane')
         await message.channel.send(embed=embedHelp)
+        return
+
+    if not message.content.lower().strip("!")[0].isdigit():
+        deleteInstant = message.id
+        await client.http.delete_message(channel_id, deleteInstant) #deletes the wrong message instant
+        embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
+        botError = await message.channel.send(embed=embedError)
+        await autodelete.msgAddAutodelete_oneDay(botError) #delete the bot Error after one day
+        return
 
     print(message.content)
     
+
+
     if "morgen" not in message.content: # This is requesting the plan everytime a command is issued !TODO: make it check the age of the plan and use the already downloaded
         today = False
         s.get_plan(False)
         print("detected today")
+        await autodelete.msgAddAutodelete_oneDay(message) #deletes the message after one day
     else:
         today = True
         s.get_plan(True)
         print("detected tomorrow")
+        await autodelete.msgAddAutodelete_twoDays(message) #deletes the message after two days
 
     klasse = message.content.lower().strip("!")
 
@@ -87,7 +113,9 @@ async def on_message(message):
    
     s.parse_plan(today=today)
     embedPlanHeute = create_embed(klasse=klasse, s=s)
-    await message.channel.send(embed=embedPlanHeute)
+    botEmbed = await message.channel.send(embed=embedPlanHeute) #? Sendet der Bot dieses Embed für den heutigen und morgigen Vertretungsplan?
+    await autodelete.msgAddAutodelete_oneDay(botEmbed)   
+
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
