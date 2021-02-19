@@ -4,13 +4,6 @@ from datetime import datetime
 
 import asyncio
 
-
-#msgCreatedAt = "0"
-
-#current_time = "0"
-
-channel_id = "797847499485872179"           #ID of the bot-commands channel, for deletig messages
-
 today = 0                                   #the current day
 
 msgDay = 0                                  #the day, the message was written
@@ -40,6 +33,7 @@ async def msgAddAutodelete_oneDay(message):
     print(saveOneDay)
     print("message day:")
     print(msgDay)
+
 
 #add message for auto deleting after two days
 async def msgAddAutodelete_twoDays(message):
@@ -76,7 +70,7 @@ async def getTime():
     
 
 #checks the day and deletes all messages from yesterday
-async def deleteMessages(client):
+async def deleteMessages(client, channel_id):
     if today != msgDay:
         for i in saveOneDay:
             await client.http.delete_message(channel_id, i)
