@@ -16,15 +16,14 @@ client = commands.Bot(command_prefix='!')
 
 prefix = "!"
 
-
 #background task to get time and delete messages every 60 seconds
 async def autodelete_background_task():
     noChannel = False  #As long as there is NO channel called "vertretungsplan", this will be set to True -> so it does only send the error message once
-    channel_id = None                 #ID of the bot-commands channel for deletig messages
 
     while True:
         try:
             channel = discord.utils.get(client.get_all_channels(), name='vertretungsplan') #get the id of the bot channel
+            global channel_id                #ID of the bot-commands channel for deletig messages
             channel_id = channel.id
             print("detected Vertretungsplan-channel:")
             print(channel_id)
@@ -72,7 +71,10 @@ async def on_message(message):
     if message.author == client.user:
         return
 
-    if message.channel.id != channel_id:
+    if 'channel_id' in globals():
+        if message.channel.id != channel_id:
+            return
+    else:
         return
 
     if not message.content.startswith(prefix):
