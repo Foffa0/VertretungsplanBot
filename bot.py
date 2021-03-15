@@ -75,14 +75,10 @@ async def on_message(message):
 
     klasse = message.content.lower().strip("!")
 
-    if klasse[0].isdigit():
-        c = False
-        for i in list(string.ascii_lowercase):
-            if klasse[1] == i:
-                c = True
-        if c == False:
-            return
-       
+    if klasse[0].isdigit() and klasse[1] in list(string.ascii_lowercase) or klasse[0].isdigit() and klasse[1].isdigit() and klasse[2] in list(string.ascii_lowercase):
+        pass
+    else:
+        return
     print("detected class")
    
     s.parse_plan(today=today)
