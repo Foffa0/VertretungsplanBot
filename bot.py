@@ -5,6 +5,7 @@ import string
 #from datetime import datetime
 
 from discord.ext import commands
+from discord import Member
 import asyncio
 import autodelete
 
@@ -16,29 +17,13 @@ client = commands.Bot(command_prefix='!')
 
 prefix = "!"
 
-#background task to get time and delete messages every 60 seconds
-async def autodelete_background_task():
-    noChannel = False  #As long as there is NO channel called "vertretungsplan", this will be set to True -> so it does only send the error message once
+channels = []
 
+#background task to get time and delete messages automatically
+async def autodelete_background_task():
     while True:
-        try:
-            channel = discord.utils.get(client.get_all_channels(), name='vertretungsplan') #get the id of the bot channel
-            global channel_id                #ID of the bot-commands channel for deletig messages
-            channel_id = channel.id
-            print("detected Vertretungsplan-channel:")
-            print(channel_id)
-        except:
-            if noChannel == True:
-                print("skipped")
-            else:
-                for guild in client.guilds:
-                    await guild.text_channels[0].send("Please create a text channel named \"Vertretungsplan\"")
-                    noChannel = True
-        else:           
-            noChannel = False
-            await autodelete.getTime()
-            await autodelete.deleteMessages(client, channel_id)
-        await asyncio.sleep(900) #900 for 15min sleep
+        await autodelete.deleteMessages(client)
+        await asyncio.sleep(1*60) #time in seconds
 
 def create_embed(klasse, s):
      # create embed
@@ -65,16 +50,9 @@ async def on_ready():
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
     client.loop.create_task(autodelete_background_task()) #starts the background task
 
-
 @client.event
 async def on_message(message):
     if message.author == client.user:
-        return
-
-    if 'channel_id' in globals():
-        if message.channel.id != channel_id:
-            return
-    else:
         return
 
     if not message.content.startswith(prefix):
@@ -86,17 +64,42 @@ async def on_message(message):
         embedHelp.set_author(name="Bot help")
         embedHelp.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2MH0LGbSQPti92wXwtdVygovKCH2UNcNJug&usqp=CAU")
         embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
+        embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
         embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen", inline=True)
-        embedHelp.set_footer(text='Made by Chris00004 and adamane')
+        embedHelp.set_footer(text='Made by adamane and Chris00004')
         await message.channel.send(embed=embedHelp)
+        return
+    
+    if message.content == prefix + 'start':
+        if message.author.guild_permissions.administrator:
+            if not message.channel.id in channels:
+                channels.append(message.channel.id)
+                await message.channel.send("Der Vertretungsplan Bot ist für diesen Channel aktiv")
+                print(message.channel.id)
+                return
+            else:
+                await message.channel.send("Der Bot ist schon auf diesem Channel aktiviert!")
+                return
+    if message.content == prefix + 'stop':
+        if message.author.guild_permissions.administrator:
+            if message.channel.id in channels:
+                channels.remove(message.channel.id)
+                await message.channel.send("Der Vertretungsplan Bot wurde für diesen Channel deaktiviert")
+                print(message.channel.id)
+                return
+            else:
+                await message.channel.send("Der Bot ist noch nicht auf diesem Channel aktiviert!")
+                return
+
+    if not message.channel.id in channels:
         return
 
     if not message.content.lower().strip("!")[0].isdigit():
         deleteInstant = message.id
-        await client.http.delete_message(channel_id, deleteInstant) #deletes the wrong message instantly
+        await client.http.delete_message(message.channel.id, deleteInstant) #deletes the wrong message instantly
         embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
         botError = await message.channel.send(embed=embedError)
-        await autodelete.msgAddAutodelete_oneDay(botError) #delete the bot Error after one day
+        await autodelete.msgAddAutodelete(botError) #delete the bot Error after one day
         return
 
     print(message.content)
@@ -107,12 +110,12 @@ async def on_message(message):
         today = False
         s.get_plan(False)
         print("detected today")
-        await autodelete.msgAddAutodelete_oneDay(message) #deletes the message after one day
+        await autodelete.msgAddAutodelete(message, 1) #deletes the message after one day
     else:
         today = True
         s.get_plan(True)
         print("detected tomorrow")
-        await autodelete.msgAddAutodelete_twoDays(message) #deletes the message after two days
+        await autodelete.msgAddAutodelete(message, 2) #deletes the message after two days
 
     klasse = message.content.lower().strip("!")
 
@@ -121,6 +124,11 @@ async def on_message(message):
         for i in list(string.ascii_lowercase):
             if klasse[1] == i:
                 c = True
+            try:
+                if klasse[2] == i:
+                    c = True
+            except:
+                pass
         if c == False:
             return
        
@@ -129,7 +137,7 @@ async def on_message(message):
     s.parse_plan(today=today)
     embedPlanHeute = create_embed(klasse=klasse, s=s)
     botEmbed = await message.channel.send(embed=embedPlanHeute) #? Sendet der Bot dieses Embed für den heutigen und morgigen Vertretungsplan?
-    await autodelete.msgAddAutodelete_oneDay(botEmbed) # deletes the embed after one day 
+    await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
     #if today == True:                                          #? Nur wenn der Bot für heute und morgen das gleiche embed sendet
     #    await autodelete.msgAddAutodelete_oneDay(botEmbed)     #? -
     #elif today == False:                                       #? -

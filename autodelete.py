@@ -4,89 +4,29 @@ from datetime import datetime
 
 import asyncio
 
-today = 0                                   #the current day
+messageList = []
 
-msgDay = 0                                  #the day, the message was written
-
-saveOneDay = []                             #list for msg IDs that are deleted after one day
-
-
-saveTwoDays1 = []                            #list 1 for msg IDs that are deleted after two days
-
-saveTwoDays2 = []                            #list 2 for msg IDs that are deleted after two days
-
-msgList = 1                                  #select list one or two 
-
-msgDay2_1 = 0                                #save the weekday for list 1
-
-msgDay2_2 = 0                                #save the weekday for list 2
-
+class Autodelete:
+    def __init__(self, msg_id, channel_id, expiration_date):
+        self.msg_id = msg_id
+        self.channel_id = channel_id
+        self.expiration_date = expiration_date
 
 #add message for auto deleting after one day
-async def msgAddAutodelete_oneDay(message):
+async def msgAddAutodelete(message, days):
     message_id = message.id
-    saveOneDay.append(message_id)
-    #now = datetime.now()                                                      
-    #msgCreatedAt = now.strftime("%M")
-    msgDay = datetime.today().weekday()
-    print("added message for autodeleting after one day")
-    print(saveOneDay)
-    print("message day:")
-    print(msgDay)
-
-
-#add message for auto deleting after two days
-async def msgAddAutodelete_twoDays(message):
-    message_id = message.id
-    #change list after one day
-    if today != msgDay2_1:
-        msgList = 2
-    if msgList == 1:
-        saveTwoDays1.append(message_id)
-        #now = datetime.now()                                                      
-        #msgCreatedAt = now.strftime("%M")
-        msgDay2_1 = datetime.today().weekday()
-        print("added message for autodeleting after two days")
-        print(saveTwoDays1)
-        print("message day:")
-        print(msgDay2_1)
-    elif msgList == 2:
-        saveTwoDays2.append(message_id)
-        msgDay2_2 = datetime.today().weekday()
-        print("added message for autodeleting after two days")
-        print(saveTwoDays2)
-        print("message day:")
-        print(msgDay2_2)
-    
-
-#get current day
-async def getTime():
-    #now = datetime.now()                                                      
-    #current_time = now.strftime("%M")
-    #print(current_time) 
-    today = datetime.today().weekday()
-    print("Day:")
-    print(today)
-    
+    expiration_day = datetime.today().weekday() 
+    for day_count in range(days):
+        expiration_day = expiration_day + 1 if expiration_day < 6 else 0
+    print(f"added message for autodeleting after {days} day(s)")
+    print(expiration_day)
+    messageList.append(Autodelete(message_id, message.channel.id, expiration_day))     
 
 #checks the day and deletes all messages from yesterday
-async def deleteMessages(client, channel_id):
-    if today != msgDay:
-        for i in saveOneDay:
-            await client.http.delete_message(channel_id, i)
-            saveOneDay.remove(i)
-            print("deleted all messages from yesterday")
-    if today == 0:
-        msgDay2_1 = -2
-        msgDay2_2 = -1
-    if today == (msgDay2_1 + 2):
-        for x in saveTwoDays1:
-            await client.http.delete_message(channel_id, x)
-            saveTwoDays1.remove(x)
-            print("deleted all messages from two days ago")
-            msgList = 1
-    if today == (msgDay2_2 + 2):
-        for y in saveTwoDays2:
-            await client.http.delete_message(channel_id, y)
-            saveTwoDays2.remove(y)
-            print("deleted all messages from two days ago")
+async def deleteMessages(client):
+    today = datetime.today().weekday()
+    for m in messageList:
+        if m.expiration_date == today:
+            await client.http.delete_message(m.channel_id, m.msg_id)
+    print("deleted all messages from yesterday")
+
