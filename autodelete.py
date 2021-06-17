@@ -1,7 +1,5 @@
-from datetime import date
-
-from datetime import datetime
-
+from datetime import timedelta, datetime
+import time
 import asyncio
 
 messageList = []
@@ -30,3 +28,13 @@ async def deleteMessages(client):
             await client.http.delete_message(m.channel_id, m.msg_id)
     print("deleted all messages from yesterday")
 
+async def deleteIn(client,message,seconds=0,minutes=0,days=0):
+    now = datetime.now()
+    deletionTime = now + timedelta(days=days, minutes=minutes, seconds=seconds)
+    msg = Autodelete(message.id, message.channel.id, deletionTime)
+    while True:
+        now = datetime.now()
+        if now.strftime("%d %H:%M:%S") == deletionTime.strftime("%d %H:%M:%S"):
+            await client.http.delete_message(msg.channel_id, msg.msg_id)
+            break
+        await asyncio.sleep(1)

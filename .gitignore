@@ -4,3 +4,4 @@ venv
 Stundenplan_parser/__pycache__/
 tmp/
 __pycache__/
+.discordBot/

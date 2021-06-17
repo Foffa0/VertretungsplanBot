@@ -1,19 +1,20 @@
 import discord
 import Stundenplan_parser  #Importiert das Modul
-#from datetime import date
+import Stundenplan
+from datetime import date
 import string
-#from datetime import datetime
-
+from datetime import datetime
 from discord.ext import commands
-from discord import Member
 import asyncio
+from discord_components import DiscordComponents, Button
 import autodelete
 
 
-s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
+# s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
+planList=[]
+
 
 client = commands.Bot(command_prefix='!')
-
 
 prefix = "!"
 
@@ -27,26 +28,50 @@ async def autodelete_background_task():
 
 def create_embed(klasse, s):
      # create embed
-        embedPlanHeute = discord.Embed(title=s.plan.Title, description="---", color=0xfd0f02)
+        embedPlanHeute = discord.Embed(title=s.title, description="---", color=0xfd0f02)
         embedPlanHeute.set_author(name=f"Klasse {klasse}")
         isEmpty = True
-        for vertretung in s.plan.Vertretungen:
-            if klasse == vertretung.Klasse: 
+        print(s.vertretungen)
+        for vertretung in s.vertretungen:
+            if not vertretung.heading == "Allgemein":
                 isEmpty = False
-                embedPlanHeute.add_field(name=f"Stunde {vertretung.Stunde}", 
-                                        value=f"""{vertretung.Vertretung} statt {vertretung.Lehrkraft} in {vertretung.Raum}
-                                        {vertretung.Sonstiges}""", inline=False)
+                embedPlanHeute.add_field(name=vertretung.heading, value=f"""**```fix\n{vertretung.content}```**""", inline=False)
+            else:
+                embedPlanHeute.add_field(name=vertretung.heading, value=f"{vertretung.content}\n---", inline=False)
         if isEmpty:
-            embedPlanHeute.add_field(name="Für diese Klasse sind keine Vertretungen eingestellt", value="Versuche es später noch einmal", inline=False)
-        embedPlanHeute.set_footer(text="Stand: " + s.plan.geaendert_am)
+            embedPlanHeute.add_field(name=":x: Für diese Klasse sind keine Vertretungen eingestellt", value="Versuche es später noch einmal", inline=False)
+        embedPlanHeute.set_footer(text="Stand: " + s.geandert)
         return embedPlanHeute
+
+def create_embed_regular(klasse, s):
+     # create embed for all courses
+        embedPlanHeute = discord.Embed(title=s.title, description="---", color=0xfd0f02)
+        embedPlanHeute.set_author(name=f"Klasse {klasse}")
+        isEmpty = True
+        for count, stunde in enumerate(s.courses): 
+            if not stunde.heading == "Allgemein":
+                isEmpty = False
+                if stunde.color == "red":
+                    embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**""", inline=False)
+                else:
+                    if s.courses[count-1].heading == stunde.heading:
+                        continue
+                    embedPlanHeute.add_field(name=stunde.heading, value=stunde.content, inline=False)
+            else:
+                embedPlanHeute.add_field(name=stunde.heading, value=f"{stunde.content}\n---", inline=False)
+        if isEmpty:
+            embedPlanHeute.add_field(name=":x: Für diese Klasse sind keine Vertretungen eingestellt", value="Versuche es später noch einmal", inline=False)
+        embedPlanHeute.set_footer(text="Stand: " + s.geandert)
+        return embedPlanHeute
+
 
 
 @client.event
 async def on_ready():
+    DiscordComponents(client)
     print('Logged in as {}'.format(client.user.name))
-    Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
-    s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
+    # Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
+    # s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
     client.loop.create_task(autodelete_background_task()) #starts the background task
 
@@ -64,8 +89,10 @@ async def on_message(message):
         embedHelp.set_author(name="Bot help")
         embedHelp.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2MH0LGbSQPti92wXwtdVygovKCH2UNcNJug&usqp=CAU")
         embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
-        embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
         embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen", inline=True)
+        embedHelp.add_field(name="Administration", value="---", inline=False)
+        embedHelp.add_field(name=f"!start", value=f"Aktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)", inline=False)
+        embedHelp.add_field(name=f"!stop", value=f"Deaktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)", inline=False)
         embedHelp.set_footer(text='Made by adamane and Chris00004')
         await message.channel.send(embed=embedHelp)
         return
@@ -74,7 +101,7 @@ async def on_message(message):
         if message.author.guild_permissions.administrator:
             if not message.channel.id in channels:
                 channels.append(message.channel.id)
-                await message.channel.send("Der Vertretungsplan Bot ist für diesen Channel aktiv")
+                await message.channel.send("Der Vertretungsplan Bot ist auf diesen Channel aktiv")
                 print(message.channel.id)
                 return
             else:
@@ -99,7 +126,7 @@ async def on_message(message):
         await client.http.delete_message(message.channel.id, deleteInstant) #deletes the wrong message instantly
         embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
         botError = await message.channel.send(embed=embedError)
-        await autodelete.msgAddAutodelete(botError) #delete the bot Error after one day
+        client.loop.create_task(autodelete.deleteIn(client,botError,30)) #delete the bot Error after one day
         return
 
     print(message.content)
@@ -108,44 +135,68 @@ async def on_message(message):
 
     if "morgen" not in message.content: # This is requesting the plan everytime a command is issued !TODO: make it check the age of the plan and use the already downloaded
         today = False
-        s.get_plan(False)
+        # s.get_plan(False)
         print("detected today")
         await autodelete.msgAddAutodelete(message, 1) #deletes the message after one day
     else:
         today = True
-        s.get_plan(True)
+        # s.get_plan(True)
         print("detected tomorrow")
         await autodelete.msgAddAutodelete(message, 2) #deletes the message after two days
 
-    klasse = message.content.lower().strip("!")
+    # klasse = message.content.lower().strip("!")
+    # klasse = klasse.replace("morgen", "")
+    klasse = message.content.strip("!").lower()
+    klasse = klasse.replace(" morgen", "")
+    print(klasse)
 
-    if klasse[0].isdigit():
-        c = False
-        for i in list(string.ascii_lowercase):
-            if klasse[1] == i:
-                c = True
-            try:
-                if klasse[2] == i:
-                    c = True
-            except:
-                pass
-        if c == False:
-            return
+    # if klasse[0].isdigit():
+    #     c = False
+    #     for i in list(string.ascii_lowercase):
+    #         if klasse[1] == i:
+    #             c = True
+    #         try:
+    #             if klasse[2] == i:
+    #                 c = True
+    #         except:
+    #             pass
+    #     if c == False:
+    #         return
+
+    if klasse[0].isdigit() and klasse[1] in list(string.ascii_lowercase) or klasse[0].isdigit() and klasse[1].isdigit() and klasse[2] in list(string.ascii_lowercase):
+        pass
+    else:
+        return
        
     print("detected class")
+    if not today:
+        d=0
+    else:
+        d=1
+
+    plan = Stundenplan.stundenplan.Stundenplan()
+    plan.getPlan(klasse, d)
    
-    s.parse_plan(today=today)
-    embedPlanHeute = create_embed(klasse=klasse, s=s)
-    botEmbed = await message.channel.send(embed=embedPlanHeute) #? Sendet der Bot dieses Embed für den heutigen und morgigen Vertretungsplan?
-    await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
-    #if today == True:                                          #? Nur wenn der Bot für heute und morgen das gleiche embed sendet
-    #    await autodelete.msgAddAutodelete_oneDay(botEmbed)     #? -
-    #elif today == False:                                       #? -
-    #    await autodelete.msgAddAutodelete_twoDays(botEmbed)    #? - 
+    # s.parse_plan(today=today)
+    embedPlanHeute = create_embed(klasse=klasse, s=plan)
+    # botEmbed = await message.channel.send(embed=embedPlanHeute)  
+    botEmbed = await message.channel.send(
+        embed=embedPlanHeute,
+        components = [
+            Button(label = "Stundenplan anzeigen", style=1, id = message.id)
+        ]
+    )
+    interaction = await client.wait_for("button_click", check = lambda i: i.component.id == f"{message.id}")
+    await botEmbed.edit(embed=create_embed_regular(klasse=klasse, s=plan))
+    await interaction.respond(type=6)
+    
+    if today == True:                                        
+       await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
+    elif today == False:                                       
+       await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days    
 
 
 with open("./bot.token", "r") as IO_bot_token:
     token = IO_bot_token.read()
-
 
 client.run(token)
