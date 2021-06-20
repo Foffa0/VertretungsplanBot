@@ -24,7 +24,7 @@ channels = []
 async def autodelete_background_task():
     while True:
         await autodelete.deleteMessages(client)
-        await asyncio.sleep(1*60) #time in seconds
+        await asyncio.sleep(30*60) #time in seconds
 
 def create_embed(klasse, s):
      # create embed

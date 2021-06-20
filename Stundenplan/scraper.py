@@ -94,7 +94,8 @@ class Scraper:
                                 heading = pTags[1].text
                                 content = i.text.replace(pTags[1].text, "")
                                 content = content.replace(pTags[0].text, "")
-                                content = content + f"({pTags[0].text})"
+                                if pTags[0].text != "":
+                                    content = content + f"({pTags[0].text})"
                             
                             else:
                                 try:
