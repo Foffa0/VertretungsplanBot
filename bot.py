@@ -147,7 +147,7 @@ async def on_message(message):
     # klasse = message.content.lower().strip("!")
     # klasse = klasse.replace("morgen", "")
     klasse = message.content.strip("!").lower()
-    klasse = klasse.replace(" morgen", "")
+    klasse = klasse.replace("morgen", "").strip()
     print(klasse)
 
     # if klasse[0].isdigit():
