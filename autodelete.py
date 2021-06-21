@@ -32,9 +32,15 @@ async def deleteIn(client,message,seconds=0,minutes=0,days=0):
     now = datetime.now()
     deletionTime = now + timedelta(days=days, minutes=minutes, seconds=seconds)
     msg = Autodelete(message.id, message.channel.id, deletionTime)
+    if seconds > 0:
+        sleeptime = 1
+    elif minutes > 0:
+        sleeptime = 60
+    else:
+        sleeptime = 60*60
     while True:
         now = datetime.now()
         if now.strftime("%d %H:%M:%S") == deletionTime.strftime("%d %H:%M:%S"):
             await client.http.delete_message(msg.channel_id, msg.msg_id)
             break
-        await asyncio.sleep(1)
+        await asyncio.sleep(sleeptime)
