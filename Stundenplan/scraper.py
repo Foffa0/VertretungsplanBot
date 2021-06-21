@@ -59,7 +59,6 @@ class Scraper:
         else:
             today = date.today() + timedelta(days=1)
         requestedDay = today.strftime("%d.%m.%Y")
-        print(requestedDay)
 
         weekday = today.strftime("%A")
 
@@ -79,7 +78,6 @@ class Scraper:
                             if i["data-role"]:
                                 break
                         except:
-                            print(i)
                             try:
                                 color = i["style"]
                                 if color == "color:black":

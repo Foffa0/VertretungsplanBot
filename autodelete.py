@@ -16,8 +16,8 @@ async def msgAddAutodelete(message, days):
     expiration_day = datetime.today().weekday() 
     for day_count in range(days):
         expiration_day = expiration_day + 1 if expiration_day < 6 else 0
-    print(f"added message for autodeleting after {days} day(s)")
-    print(expiration_day)
+    # print(f"added message for autodeleting after {days} day(s)")
+    # print(expiration_day)
     messageList.append(Autodelete(message_id, message.channel.id, expiration_day))     
 
 #checks the day and deletes all messages from yesterday

@@ -16,7 +16,6 @@ class Stundenplan():
         self.title = s.title
         vertretungen = []
         for x in self.courses:
-            print(x.color)
             if x.color == "red" or x.heading == "Allgemein":
                 vertretungen.append(x)
         self.vertretungen = vertretungen
