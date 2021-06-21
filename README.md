@@ -1,2 +1,7 @@
 # VertretungsplanBot
-Dies ist ein komplett nutzloses Readme
+Command List:
+ - ![Klasse]
+ - ![Klasse] + morgen
+ - !start (activate the bot in this channel | !requires admin permissions!)
+ - !stop (deactivate the bot in this channel | !requires admin permissions!)
+ - !help
