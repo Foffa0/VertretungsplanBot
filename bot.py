@@ -1,18 +1,17 @@
 import discord
-import Stundenplan_parser  #Importiert das Modul
+# import Stundenplan_parser  #Importiert das Modul
 import Stundenplan
-from datetime import date
+# from datetime import date
 import string
-from datetime import datetime
+import os
+# from datetime import datetime
 from discord.ext import commands
 import asyncio
 from discord_components import DiscordComponents, Button
 import autodelete
 
-
 # s = Stundenplan_parser.stundenplan.Stundenplan() # Erstellt eine Stundenplan_Instanz
-planList=[]
-
+token = os.environ.get('BOT_TOKEN')
 
 client = commands.Bot(command_prefix='!')
 
@@ -63,7 +62,6 @@ def create_embed_regular(klasse, s):
             embedPlanHeute.add_field(name=":x: Für diese Klasse sind keine Vertretungen eingestellt", value="Versuche es später noch einmal", inline=False)
         embedPlanHeute.set_footer(text="Stand: " + s.geandert)
         return embedPlanHeute
-
 
 
 @client.event
@@ -128,11 +126,7 @@ async def on_message(message):
         botError = await message.channel.send(embed=embedError)
         client.loop.create_task(autodelete.deleteIn(client,botError,30)) #delete the bot Error after one day
         return
-
-    print(message.content)
     
-
-
     if "morgen" not in message.content: # This is requesting the plan everytime a command is issued !TODO: make it check the age of the plan and use the already downloaded
         today = False
         # s.get_plan(False)
@@ -141,34 +135,16 @@ async def on_message(message):
     else:
         today = True
         # s.get_plan(True)
-        print("detected tomorrow")
         await autodelete.msgAddAutodelete(message, 2) #deletes the message after two days
 
-    # klasse = message.content.lower().strip("!")
-    # klasse = klasse.replace("morgen", "")
     klasse = message.content.strip("!").lower()
     klasse = klasse.replace("morgen", "").strip()
-    print(klasse)
-
-    # if klasse[0].isdigit():
-    #     c = False
-    #     for i in list(string.ascii_lowercase):
-    #         if klasse[1] == i:
-    #             c = True
-    #         try:
-    #             if klasse[2] == i:
-    #                 c = True
-    #         except:
-    #             pass
-    #     if c == False:
-    #         return
 
     if klasse[0].isdigit() and klasse[1] in list(string.ascii_lowercase) or klasse[0].isdigit() and klasse[1].isdigit() and klasse[2] in list(string.ascii_lowercase):
         pass
     else:
         return
        
-    print("detected class")
     if not today:
         d=0
     else:
@@ -195,8 +171,7 @@ async def on_message(message):
     elif today == False:                                       
        await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days    
 
-
-with open("./bot.token", "r") as IO_bot_token:
-    token = IO_bot_token.read()
+# with open("./bot.token", "r") as IO_bot_token:
+#     token = IO_bot_token.read()
 
 client.run(token)
