@@ -63,6 +63,21 @@ def create_embed_regular(klasse, s):
         embedPlanHeute.set_footer(text="Stand: " + s.geandert)
         return embedPlanHeute
 
+def helpEmbed():
+    embedHelp = discord.Embed(title="Vertretungsplan Bot Commands:", description="---", color=0xfd0f02)
+    embedHelp.set_author(name="Bot help")
+    embedHelp.set_thumbnail(
+        url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2MH0LGbSQPti92wXwtdVygovKCH2UNcNJug&usqp=CAU")
+    embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
+    embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen",
+                        inline=True)
+    embedHelp.add_field(name="Administration", value="---", inline=False)
+    embedHelp.add_field(name=f"!start", value=f"Aktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)",
+                        inline=False)
+    embedHelp.add_field(name=f"!stop",
+                        value=f"Deaktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)", inline=False)
+    embedHelp.set_footer(text='Made by adamane and Chris00004')
+
 
 @client.event
 async def on_ready():
@@ -83,15 +98,8 @@ async def on_message(message):
 
     if message.content == prefix + 'help':  # Helper Message Handler
         # create help embed
-        embedHelp = discord.Embed(title="Vertretungsplan Bot Commands:", description="---", color=0xfd0f02)
-        embedHelp.set_author(name="Bot help")
-        embedHelp.set_thumbnail(url="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT2MH0LGbSQPti92wXwtdVygovKCH2UNcNJug&usqp=CAU")
-        embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
-        embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen", inline=True)
-        embedHelp.add_field(name="Administration", value="---", inline=False)
-        embedHelp.add_field(name=f"!start", value=f"Aktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)", inline=False)
-        embedHelp.add_field(name=f"!stop", value=f"Deaktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)", inline=False)
-        embedHelp.set_footer(text='Made by adamane and Chris00004')
+        embedHelp = helpEmbed()
+
         await message.channel.send(embed=embedHelp)
         return
     
