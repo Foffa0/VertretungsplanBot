@@ -194,4 +194,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.ZUg7wdjuatGMnT0kYNJISpB4llE")
+client.run(token)
