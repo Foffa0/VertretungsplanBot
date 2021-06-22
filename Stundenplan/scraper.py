@@ -84,6 +84,8 @@ class Scraper:
                                     color = "black"
                                 elif color == "color:red":
                                     color = "red"
+                                elif color == "color:blue":
+                                    color = "blue"
                             except:
                                 color = "black"
                             # try:
@@ -101,10 +103,14 @@ class Scraper:
                                         heading = i.p.text
                                         content = i.text.replace(i.p.text, "")    
                                 except:
-                                    heading = "Allgemein"
-                                    content = str(i.p).replace("<br/>", "\n")
-                                    content = content.replace("<p>", "")
-                                    content = content.replace("</p>", "")
+                                    if color == "blue":
+                                        heading = "Prüfungen:"
+                                        content = i.text
+                                    else:
+                                        heading = "Allgemein"
+                                        content = str(i.p).replace("<br/>", "\n")
+                                        content = content.replace("<p>", "")
+                                        content = content.replace("</p>", "")
 
                             courseList.append(Stunde(heading, content, color))
             #logout

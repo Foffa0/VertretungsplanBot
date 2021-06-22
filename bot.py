@@ -32,7 +32,9 @@ def create_embed(klasse, s):
         isEmpty = True
         print(s.vertretungen)
         for vertretung in s.vertretungen:
-            if not vertretung.heading == "Allgemein":
+            if vertretung.heading == "Prüfungen:":
+                embedPlanHeute.add_field(name=vertretung.heading, value=f"""**```fix\n{vertretung.content}```**---""", inline=False)
+            elif not vertretung.heading == "Allgemein":
                 isEmpty = False
                 embedPlanHeute.add_field(name=vertretung.heading, value=f"""**```fix\n{vertretung.content}```**""", inline=False)
             else:
@@ -47,8 +49,10 @@ def create_embed_regular(klasse, s):
         embedPlanHeute = discord.Embed(title=s.title, description="---", color=0xfd0f02)
         embedPlanHeute.set_author(name=f"Klasse {klasse}")
         isEmpty = True
-        for count, stunde in enumerate(s.courses): 
-            if not stunde.heading == "Allgemein":
+        for count, stunde in enumerate(s.courses):
+            if stunde.heading == "Prüfungen:":
+                embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**""", inline=False)
+            elif not stunde.heading == "Allgemein":
                 isEmpty = False
                 if stunde.color == "red":
                     embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**""", inline=False)
@@ -190,4 +194,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run(token)
+client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.ZUg7wdjuatGMnT0kYNJISpB4llE")
