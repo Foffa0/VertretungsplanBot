@@ -169,15 +169,23 @@ async def on_message(message):
         components = [
             Button(label = "Stundenplan anzeigen", style=1, id = message.id)
         ]
-    )
-    interaction = await client.wait_for("button_click", check = lambda i: i.component.id == f"{message.id}")
-    await botEmbed.edit(embed=create_embed_regular(klasse=klasse, s=plan))
-    await interaction.respond(type=6)
-    
+    )    
     if today == True:                                        
        await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
     elif today == False:                                       
        await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days    
+    
+    #handle button clicks
+    while True:
+        interaction = await client.wait_for("button_click", check = lambda i: i.component.id == f"{message.id}")
+        for x in botEmbed.components[0]:
+            if x.label == "Stundenplan anzeigen":
+                await botEmbed.edit(embed=create_embed_regular(klasse=klasse, s=plan), components=[Button(label = "weniger anzeigen", style=1, id = message.id)])
+                x.label = "weniger anzeigen"
+            else:
+                await botEmbed.edit(embed=embedPlanHeute, components=[Button(label = "Stundenplan anzeigen", style=1, id = message.id)])
+                x.label = "Stundenplan anzeigen"
+            await interaction.respond(type=6)  
 
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
