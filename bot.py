@@ -3,6 +3,7 @@ import discord
 import Stundenplan
 # from datetime import date
 import string
+import json
 import os
 # from datetime import datetime
 from discord.ext import commands
@@ -89,6 +90,9 @@ def helpEmbed():
 async def on_ready():
     DiscordComponents(client)
     print('Logged in as {}'.format(client.user.name))
+    with open("data_file.json", "r") as read_file:
+        x = json.load(read_file)
+        print(x)
     # Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
     # s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
     await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
@@ -122,6 +126,11 @@ async def on_message(message):
                 channels.append(message.channel.id)
                 await message.channel.send("Der Vertretungsplan Bot ist auf diesen Channel aktiv")
                 print(message.channel.id)
+                with open("data_file.json", "w") as read_file:
+                    data = {
+                        "channels": channels,
+                    }
+                    json.dump(data  ,read_file)
                 return
             else:
                 await message.channel.send("Der Bot ist schon auf diesem Channel aktiviert!")
@@ -132,6 +141,11 @@ async def on_message(message):
                 channels.remove(message.channel.id)
                 await message.channel.send("Der Vertretungsplan Bot wurde für diesen Channel deaktiviert")
                 print(message.channel.id)
+                with open("data_file.json", "w") as read_file:
+                    data = {
+                        "channels": channels,
+                    }
+                    json.dump(data  ,read_file)
                 return
             else:
                 await message.channel.send("Der Bot ist noch nicht auf diesem Channel aktiviert!")
@@ -205,4 +219,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run(token)
+client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.lJRd0hQnru_CSSC0TmzbiPlyyxE")
