@@ -90,7 +90,7 @@ def helpEmbed():
 async def on_ready():
     DiscordComponents(client)
     print('Logged in as {}'.format(client.user.name))
-    with open("data_file.json", "r") as read_file:
+    with open("./data_files/data_file.json", "r") as read_file:
         x = json.load(read_file)
         print(x)
     # Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
@@ -126,7 +126,7 @@ async def on_message(message):
                 channels.append(message.channel.id)
                 await message.channel.send("Der Vertretungsplan Bot ist auf diesen Channel aktiv")
                 print(message.channel.id)
-                with open("data_file.json", "w") as read_file:
+                with open("./data_files/data_file.json", "w") as read_file:
                     data = {
                         "channels": channels,
                     }
@@ -141,7 +141,7 @@ async def on_message(message):
                 channels.remove(message.channel.id)
                 await message.channel.send("Der Vertretungsplan Bot wurde für diesen Channel deaktiviert")
                 print(message.channel.id)
-                with open("data_file.json", "w") as read_file:
+                with open("./data_files/data_file.json", "w") as read_file:
                     data = {
                         "channels": channels,
                     }
@@ -219,4 +219,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run(token)
+client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.lJRd0hQnru_CSSC0TmzbiPlyyxE")
