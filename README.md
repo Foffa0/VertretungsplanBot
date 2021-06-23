@@ -5,3 +5,4 @@ Command List:
  - !start (activate the bot in this channel | !requires admin permissions!)
  - !stop (deactivate the bot in this channel | !requires admin permissions!)
  - !help
+ - !invite
