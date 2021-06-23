@@ -98,9 +98,7 @@ async def on_ready():
     client.loop.create_task(autodelete_background_task()) #starts the background task
     while True:
         await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
-        await asyncio.sleep(15)
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="!invite me onto your server"))
-        await asyncio.sleep(15)
+        
 
 @client.event
 async def on_message(message):
@@ -223,4 +221,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.lJRd0hQnru_CSSC0TmzbiPlyyxE")
+client.run(token)
