@@ -95,8 +95,12 @@ async def on_ready():
         print(x)
     # Stundenplan_parser.stundenplan.Stundenplan.remove_plan() #Cleanup old Leftovers
     # s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
-    await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
     client.loop.create_task(autodelete_background_task()) #starts the background task
+    while True:
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
+        await asyncio.sleep(15)
+        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="!invite me onto your server"))
+        await asyncio.sleep(15)
 
 @client.event
 async def on_message(message):
