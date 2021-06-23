@@ -75,6 +75,8 @@ def helpEmbed():
     embedHelp.add_field(name=f"{prefix}[Klasse]", value=f"Vertretungsplan heute\n Bsp: {prefix}9a", inline=False)
     embedHelp.add_field(name=f"{prefix}[Klasse] morgen", value=f"Vertretungsplan für morgen \n Bsp: {prefix}9a morgen",
                         inline=True)
+    embedHelp.add_field(name=f"{prefix}invite", value="Füge den Bot auf deinen Server hinzu",
+                        inline=True)
     embedHelp.add_field(name="Administration", value="---", inline=False)
     embedHelp.add_field(name=f"!start", value=f"Aktiviert den Bot in diesem channel (Admin Berechtigung erforderlich!)",
                         inline=False)
@@ -106,7 +108,14 @@ async def on_message(message):
 
         await message.channel.send(embed=embedHelp)
         return
-    
+
+    if message.content == prefix + 'invite':
+        await message.channel.send(
+            "Füge mich auf deinem Server hinzu:",
+            components = [
+            Button(label = "Auf Server einladen", style=5, url="https://discord.com/api/oauth2/authorize?client_id=797529729632567358&permissions=92160&scope=bot")
+        ],)
+        return
     if message.content == prefix + 'start':
         if message.author.guild_permissions.administrator:
             if not message.channel.id in channels:
@@ -131,7 +140,7 @@ async def on_message(message):
     if not message.channel.id in channels:
         return
 
-    if not message.content.lower().strip("!")[0].isdigit():
+    if not message.content.lower().strip("! ")[0].isdigit():
         deleteInstant = message.id
         await client.http.delete_message(message.channel.id, deleteInstant) #deletes the wrong message instantly
         embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
@@ -176,8 +185,10 @@ async def on_message(message):
     )    
     if today == True:                                        
        await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
+       await autodelete.msgAddAutodelete(message, 1)
     elif today == False:                                       
-       await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days    
+       await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days 
+       await autodelete.msgAddAutodelete(message, 2)   
     
     #handle button clicks
     while True:
@@ -194,4 +205,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.ZUg7wdjuatGMnT0kYNJISpB4llE")
+client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.lJRd0hQnru_CSSC0TmzbiPlyyxE")
