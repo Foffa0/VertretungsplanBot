@@ -22,7 +22,6 @@ async def msgAddAutodelete(message, days):
 async def deleteMessages(client):
     today = datetime.today().weekday()
     for m in messageList:
-        print(m.channel_id, m.msg_id)
         if m.expiration_date == today:
             try:
                 await client.http.delete_message(m.channel_id, m.msg_id)

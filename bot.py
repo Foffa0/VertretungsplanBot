@@ -71,7 +71,10 @@ def create_embed_regular(klasse, s):
             if stunde.color == "red":
                 try:
                     if s.courses[count+1].heading == stunde.heading:
-                        embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**{s.courses[count+1].content}""", inline=False)
+                        if s.courses[count+1].color == "blue":
+                            embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**{s.courses[count+1].content}""", inline=False)
+                        else:
+                            embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}\n\n{s.courses[count+1].content}```**""", inline=False)
                     else:
                         embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**""", inline=False)
                 except:
@@ -237,4 +240,4 @@ async def on_message(message):
 # with open("./bot.token", "r") as IO_bot_token:
 #     token = IO_bot_token.read()
 
-client.run("ODU2NjM2OTY4MzM0MDAwMTQ4.YND7WA.ZBXqsgbk9uQ6tw1SeJTT5bA23FU")
+client.run(token)

@@ -1,4 +1,4 @@
-from bs4.element import PYTHON_SPECIFIC_ENCODINGS
+# from bs4.element import PYTHON_SPECIFIC_ENCODINGS
 import Stundenplan.scraper as scraper
 from datetime import datetime
 class Stundenplan():
