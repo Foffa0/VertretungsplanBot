@@ -71,10 +71,10 @@ def create_embed_regular(klasse, s):
             if stunde.color == "red":
                 try:
                     if s.courses[count+1].heading == stunde.heading:
-                        if s.courses[count+1].color == "blue":
+                        if s.courses[count+1].color == "black":
                             embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**{s.courses[count+1].content}""", inline=False)
                         else:
-                            embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}\n\n{s.courses[count+1].content}```**""", inline=False)
+                            embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}\n{s.courses[count+1].content}```**""", inline=False)
                     else:
                         embedPlanHeute.add_field(name=stunde.heading, value=f"""**```fix\n{stunde.content}```**""", inline=False)
                 except:
