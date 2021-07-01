@@ -101,7 +101,9 @@ class Scraper:
                                 try:
                                     if "ui-li-aside" in i.p["class"]:
                                         heading = i.p.text
-                                        content = i.text.replace(i.p.text, "")    
+                                        content = str(i).replace("<br/>", "\n")
+                                        content = BeautifulSoup(content, 'lxml')
+                                        content = content.text.replace(i.p.text, "")    
                                 except:
                                     if color == "blue":
                                         heading = "Prüfungen:"
