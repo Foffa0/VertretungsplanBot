@@ -49,8 +49,10 @@ class Scraper:
         request = urllib.request.Request(authentication_url, binary_data, headers)
         response = urllib.request.urlopen(request)
         soup = BeautifulSoup(response, 'lxml')
-
-        if date.today().weekday() == 5:
+        print(day)
+        if day == 1 and date.today().weekday() == 4:
+            today = date.today() + timedelta(days=3)
+        elif date.today().weekday() == 5:
             today = date.today() + timedelta(days=2)
         elif date.today().weekday() == 6:
             today = date.today() + timedelta(days=1)
