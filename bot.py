@@ -193,8 +193,8 @@ async def on_message(message):
         today = True
         # s.get_plan(True)
 
-    klasse = message.content.strip("!").lower()
-    klasse = klasse.replace("morgen", "").strip()[:3]
+    klasse = message.content.strip("!").lower().replace("heute", "")
+    klasse = klasse.replace("morgen", "")
     print(klasse)
 
     if klasse[0].isdigit() and klasse[1] in list(string.ascii_lowercase) or klasse[0].isdigit() and klasse[1].isdigit() and klasse[2] in list(string.ascii_lowercase):
