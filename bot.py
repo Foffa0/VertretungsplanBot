@@ -118,10 +118,12 @@ async def on_ready():
     # s = Stundenplan_parser.stundenplan.Stundenplan() # Creates a Stundenplan Instance
     client.loop.create_task(autodelete_background_task()) #starts the background task
     while True:
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
-        await asyncio.sleep(15)
-        await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="!invite me onto your server"))
-        await asyncio.sleep(15)
+        await client.change_presence(status=discord.Status.idle, activity=discord.Activity(type=discord.ActivityType.playing, name="Der Bot funktioniert vorübergehend nicht, bis der umstieg auf Untis geklappt hat"))
+        #! uncomment when bot is updated
+        # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.listening, name="!help")) #create custom bot state
+        # await asyncio.sleep(15)
+        # await client.change_presence(activity=discord.Activity(type=discord.ActivityType.playing, name="!invite me onto your server"))
+        # await asyncio.sleep(15)
 
 @client.event
 async def on_message(message):
@@ -182,7 +184,7 @@ async def on_message(message):
         await client.http.delete_message(message.channel.id, deleteInstant) #deletes the wrong message instantly
         embedError = discord.Embed(title=":x:  Error", description="Invalid command", color=0xfd0f02)
         botError = await message.channel.send(embed=embedError)
-        client.loop.create_task(autodelete.deleteIn(client,botError,30)) #delete the bot Error after one day
+        client.loop.create_task(autodelete.deleteIn(client,botError,30)) #delete the bot Error after 30 seconds
         return
     
     if "morgen" not in message.content: # This is requesting the plan everytime a command is issued !TODO: make it check the age of the plan and use the already downloaded
@@ -220,11 +222,11 @@ async def on_message(message):
         ]
     )    
     if today == True:                                        
-       await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after one day 
-       await autodelete.msgAddAutodelete(message, 1)
+       await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after 2 days
+       await autodelete.msgAddAutodelete(message, 2)
     elif today == False:                                       
-       await autodelete.msgAddAutodelete(botEmbed, 2) # deletes the embed after two days 
-       await autodelete.msgAddAutodelete(message, 2)   
+       await autodelete.msgAddAutodelete(botEmbed, 1) # deletes the embed after 1 day
+       await autodelete.msgAddAutodelete(message, 1)   
     #handle button clicks
     while True:
         interaction = await client.wait_for("button_click", check = lambda i: i.component.id == f"{message.id}")
