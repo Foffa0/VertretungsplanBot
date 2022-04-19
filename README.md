@@ -6,3 +6,5 @@ Command List:
  - !stop (deactivate the bot in this channel | !requires admin permissions!)
  - !help
  - !invite
+
+##Deprecated
