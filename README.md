@@ -7,4 +7,4 @@ Command List:
  - !help
  - !invite
 
-## Deprecated
+## Project Deprecated
